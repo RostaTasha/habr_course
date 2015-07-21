@@ -93,23 +93,19 @@ void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor color) {
 void color_triangle(int x0, int y0, int x1, int y1, int x2, int y2, TGAImage &image, TGAColor color){
 
 
-float a_t;
-float b_t;
 
-float x_cross1,y_cross1;
-float x_cross2,y_cross2;
 
 line(x0, y0, x1, y1, image, red);
 line(x0, y0, x2, y2, image, red);
 line(x2, y2, x1, y1, image, red);
 
 
-float u_border=max(max(y0,y1),y2);
-float b_border=min(min(y0,y1),y2);
+int u_border=max(max(y0,y1),y2);
+int b_border=min(min(y0,y1),y2);
 
-float r_border=max(max(x0,x1),x2);
-float l_border=min(min(x0,x1),x2);
-float up=false;
+int r_border=max(max(x0,x1),x2);
+int l_border=min(min(x0,x1),x2);
+//float up=false;
 
 //line(r_border, u_border, r_border, b_border, image, blue);
 //line(l_border, u_border, l_border, b_border, image, blue);
