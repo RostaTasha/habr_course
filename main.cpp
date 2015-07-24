@@ -202,18 +202,26 @@ void color_triangle_s(d3<int> p0, d3<int> p1, d3<int> p2, TGAImage &image, TGACo
 	int z_limitu;
 	int z_limitb;
 
-
+//////////////*//////////////////
+////////////\ *	 \///////////////
+//////////\	  *		\////////////
+////////\	  *			\////////
+//////\		  *				*////
+////\         *\     ////////////
+//*//////////////////////////////
+////////////////////////////////
+//
 float A1=(float)(y2-y1)/(x2-x01);
 float B1 = y1-A1*x01;
 
 float A1_=(float)(z2-z1)/(x2-x01);
-float B1_ = z1-A1*x01;
+float B1_ = z1-A1_*x01;
 
 float A0=(float)(y2-y0)/(x2-x01);
 float B0 = y0-A0*x01;
 
 float A0_=(float)(z2-z0)/(x2-x01);
-float B0_ = z0-A0*x01;
+float B0_ = z0-A0_*x01;
 
 
 if (x01<x2){
