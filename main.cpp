@@ -20,6 +20,8 @@ x=0;
 y=0;
 z=0;
 }
+
+
 int x;
 int y;
 int z;
@@ -39,9 +41,9 @@ p2=a2;
 
 threed get_norm(){
 
-	int norm_x=(p1.y-p0.y)*(p2.z-p0.z)-(p2.y-p0.y)*(p1.z-p0.z);
-	int norm_y=(p2.x-p0.x)*(p1.z-p0.z)-(p1.x-p0.x)*(p2.z-p0.z);
-	int norm_z=(p1.x-p0.x)*(p2.y-p0.y)-(p2.x-p0.x)*(p1.y-p0.y);
+	int norm_x=(p2.y-p0.y)*(p1.z-p0.z)-(p1.y-p0.y)*(p2.z-p0.z);
+	int norm_y=(p1.x-p0.x)*(p2.z-p0.z)-(p2.x-p0.x)*(p1.z-p0.z);
+	int norm_z=(p2.x-p0.x)*(p1.y-p0.y)-(p1.x-p0.x)*(p2.y-p0.y);
 
 
 return threed(norm_x,norm_y,norm_z);
@@ -91,6 +93,7 @@ int main(int argc, char** argv) {
 	std::vector<int>  triangles;
 	parser(coords, triangles);
 	std::cout<<"coords size is "<<coords.size()<<std::endl;
+	std::cout<<"triangles size is "<<triangles.size()<<std::endl;
 	/*for (int i=0; i<coords.size();i+=3){
 		//std::cout<<(int)(width*(coords[i]+1.0)/2)<<" "<<(int)(height*(coords[i+1]+1.0)/2)<<std::endl;
 		image.set((int)(width*(coords[i]+1.0)/2),(int)(height*(coords[i+1]+1.0)/2), white);
@@ -119,7 +122,7 @@ int main(int argc, char** argv) {
 //		line(x_0, y_0, x_2, y_2, image, white);
     int light_x=0;
     int light_y=0;
-    int light_z=1;
+    int light_z=-1;
     printf("size is %d",vectriangles.size() );
 	for(std::vector<int>::size_type i = 0; i != vectriangles.size(); i++) {
 		threed temp=vectriangles[i].get_norm();
@@ -136,14 +139,14 @@ int main(int argc, char** argv) {
 
 
 
-
+	}
 
 
 
 	image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
 	image.write_tga_file("output.tga");
 	return 0;
-}
+
 
 }
 float sqrt3(int x, int y, int z){
@@ -234,17 +237,14 @@ color_triangle_s(x0, y0, cross_coord, x1, y1, image, color);
 std::swap(x0, x2);
 std::swap(y0, y2);
 }
-
 if (u_border==y1){
 std::swap(x1, x2);
 std::swap(y1, y2);
 }
-
 if (b_border==y0){
 std::swap(x0, x1);
 std::swap(y0, y1);
 }
-
 if (b_border==y2){
 std::swap(x2, x1);
 std::swap(y2, y1);
