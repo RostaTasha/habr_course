@@ -1,75 +1,12 @@
 #include "tgaimage.h"
 #include "parser.hpp"
-#include <stdlib.h>
-#include <cmath>
-#include <vector>
-#include <algorithm>    // std::sort
-
-using namespace std;
-
-
-class threed{
-public:
-threed (int a, int b, int c){
-x=a;
-y=b;
-z=c;
-}
-threed(){
-x=0;
-y=0;
-z=0;
-}
-
-
-int x;
-int y;
-int z;
-};
-
-
-class triangle{
-public:
-threed p0;
-threed p1;
-threed p2;
-triangle(threed a0, threed a1, threed a2){
-p0=a0;
-p1=a1;
-p2=a2;
-}
-
-threed get_norm(){
-
-	int norm_x=(p2.y-p0.y)*(p1.z-p0.z)-(p1.y-p0.y)*(p2.z-p0.z);
-	int norm_y=(p1.x-p0.x)*(p2.z-p0.z)-(p2.x-p0.x)*(p1.z-p0.z);
-	int norm_z=(p2.x-p0.x)*(p1.y-p0.y)-(p1.x-p0.x)*(p2.y-p0.y);
-
-
-return threed(norm_x,norm_y,norm_z);
-}
 
 
 
-float mean_h(int i=2){
-	switch (i)
-	      {
-	         case 0:
-	            return (float)(p1.x+p2.x+p0.x)/3.;
-	         case 1:
-	        	 return (float)(p1.y+p2.y+p0.y)/3.;
-	         default:
-	         	 return (float)(p1.z+p2.z+p0.z)/3.;
-	      }
-}
 
-};
 
-bool mean_h(triangle t1, triangle t2){
 
-return t1.mean_h()<t2.mean_h();
 
-}
 
 void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor color);
 void color_triangle(int x0, int y0, int x1, int y1, int x2, int y2, TGAImage &image, TGAColor color);
@@ -86,55 +23,32 @@ const TGAColor blue   = TGAColor(0, 0,   255,   255);
 
 int main(int argc, char** argv) {
 	int x_0,x_1,y_0,y_1,z_0,z_1, x_2,y_2,z_2;
-	vector<triangle> vectriangles;
+	vector<d3<float> > real_coords;
 	TGAImage image(width, height, TGAImage::RGB);
 	//image.set(50, 50, red);
-	std::vector<float>  coords;
-	std::vector<int>  triangles;
-	parser(coords, triangles);
-	std::cout<<"coords size is "<<coords.size()<<std::endl;
-	std::cout<<"triangles size is "<<triangles.size()<<std::endl;
-	/*for (int i=0; i<coords.size();i+=3){
-		//std::cout<<(int)(width*(coords[i]+1.0)/2)<<" "<<(int)(height*(coords[i+1]+1.0)/2)<<std::endl;
-		image.set((int)(width*(coords[i]+1.0)/2),(int)(height*(coords[i+1]+1.0)/2), white);
-	}*/
-
-	for (unsigned int j=0; j<triangles.size();j+=3){
-	//for (unsigned int j=0; j<12;j+=3){
-			x_0=(int)(width*(coords[triangles[j]*3-3]+1.0)/2);
-			y_0=(int)(height*(coords[triangles[j]*3+1-3]+1.0)/2);
-			z_0= (int)(zeight*(coords[triangles[j]*3+2-3]+1.0)/2);
-			x_1=(int)(width*(coords[triangles[j+1]*3-3]+1.0)/2);
-			y_1=(int)(height*(coords[triangles[j+1]*3+1-3]+1.0)/2);
-			z_1=(int)(zeight*(coords[triangles[j+1]*3+2-3]+1.0)/2);
-			x_2=(int)(width*(coords[triangles[j+2]*3-3]+1.0)/2);
-			y_2=(int)(height*(coords[triangles[j+2]*3+1-3]+1.0)/2);
-			z_2=(int)(zeight*(coords[triangles[j+2]*3+1-3]+1.0)/2);
-			vectriangles.push_back(triangle(threed(x_0,y_0,z_0),threed(x_1,y_1,z_1),threed(x_2,y_2,z_2)));
-	}
+	std::vector<d3<int> >  triangles;
+	parser(real_coords, triangles);
 
 
-	sort(vectriangles.begin(), vectriangles.end(), mean_h);
-//		line(x_0, y_0, x_1, y_1, image, white);
+    vecd3<float> light_vec = vecd3<float>((float)(0.),(float)(0.),(float)(-1.));
+	for(std::vector<int>::size_type i = 0; i != triangles.size(); i++) {
 
-//		line(x_1, y_1, x_2, y_2, image, white);
+		d3<float> tr_0=real_coords[triangles[i].x-1];
+		d3<float> tr_1=real_coords[triangles[i].y-1];
+		d3<float> tr_2=real_coords[triangles[i].z-1];
 
-//		line(x_0, y_0, x_2, y_2, image, white);
-    int light_x=0;
-    int light_y=0;
-    int light_z=-1;
-    printf("size is %d",vectriangles.size() );
-	for(std::vector<int>::size_type i = 0; i != vectriangles.size(); i++) {
-		threed temp=vectriangles[i].get_norm();
+		vecd3<float> norm_vec = (vecd3<float>(tr_2,tr_0))^(vecd3<float>(tr_1,tr_0));
+		norm_vec.normalize();
 
-		float cos_alf = (light_x*temp.x+light_y*temp.y+light_z*temp.z)/sqrt3(temp.x,temp.y,temp.z)/sqrt3(light_x,light_y,light_z);
+		float cos_alf=light_vec*norm_vec;
+		cout<<cos_alf<<endl;
 
 
-	     if (cos_alf>0){
+	    if (cos_alf>0){
 	     int color_code = (int)(((cos_alf))*255);
-		color_triangle(vectriangles[i].p0.x, vectriangles[i].p0.y, vectriangles[i].p1.x,vectriangles[i].p1.y, vectriangles[i].p2.x, vectriangles[i].p2.y, image, TGAColor(color_code,color_code, color_code, 255));
+		color_triangle(width*(tr_0.x+1.)/2., height*(tr_0.y+1.)/2., width*(tr_1.x+1.)/2., height*(tr_1.y+1.)/2., width*(tr_2.x+1.)/2., height*(tr_2.y+1.)/2., image, TGAColor(color_code,color_code, color_code, 255));
 	}
-
+	   //  color_triangle(width*(tr_0.x+1.)/2., height*(tr_0.y+1.)/2., width*(tr_1.x+1.)/2., height*(tr_1.y+1.)/2., width*(tr_2.x+1.)/2., height*(tr_2.y+1.)/2., image, TGAColor(rand()%255,rand()%255, rand()%255, 255));
 
 
 
@@ -149,9 +63,7 @@ int main(int argc, char** argv) {
 
 
 }
-float sqrt3(int x, int y, int z){
-return sqrtf((float)x*x+(float)y*y+(float)z*z);
-}
+
 
 
 void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor color) {
