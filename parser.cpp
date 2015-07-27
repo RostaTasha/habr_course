@@ -7,11 +7,7 @@
 
 #include "parser.hpp"
 
-<<<<<<< HEAD
 void parser(std::vector<d3<float> >  & coords, std::vector<d3<int> >  & triangles, std::vector<d3<float> > & norm, std::vector<d3<int> >  & norm_triangles){
-=======
-void parser(std::vector<d3<float> >  & coords, vector<d3<int> >  & triangles){
->>>>>>> 508dc66b05d617746b55192a98f3e9f0aa6b4989
 	  std::ifstream myfile;
 	  unsigned int num=0;
 	  float tempx, tempy,tempz;
@@ -41,14 +37,9 @@ void parser(std::vector<d3<float> >  & coords, vector<d3<int> >  & triangles){
 	  if (line[0]=='f' && line[1]==' '){
 		  line=line.substr(2);
 		  //std::cout<<line<<std::endl;
-<<<<<<< HEAD
 		  std::sscanf (line.c_str(),"%d/%*d/%d %d/%*d/%d %d/%*d/%d",&tempa,&tempa1,&tempb,&tempb1,&tempc,&tempc1);
 		  triangles.push_back(d3<int>(tempa, tempb, tempc));
 		  norm_triangles.push_back(d3<int>(tempa1, tempb1, tempc1));
-=======
-		  std::sscanf (line.c_str(),"%d/%*d/%*d %d/%*d/%*d %d/%*d/%*d",&tempa,&tempb,&tempc);
-		  triangles.push_back(d3<int>(tempa, tempb, tempc));
->>>>>>> 508dc66b05d617746b55192a98f3e9f0aa6b4989
 	  }
 
 	  }

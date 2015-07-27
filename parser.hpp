@@ -109,11 +109,7 @@ void normalize(){
 
 
 
-<<<<<<< HEAD
 void parser(std::vector<d3<float> >  & coords, std::vector<d3<int> >  & triangles, std::vector<d3<float> > & norm, std::vector<d3<int> >  & norm_triangles);
-=======
-void parser(std::vector<d3<float> > & coords, vector<d3<int> >  & triangles);
->>>>>>> 508dc66b05d617746b55192a98f3e9f0aa6b4989
 float max(float a, float b);
 float min(float a, float b);
 
