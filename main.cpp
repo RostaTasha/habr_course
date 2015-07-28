@@ -51,19 +51,28 @@ int main(int argc, char** argv) {
 		light_vec.normalize();
 
 		float cos_alf=light_vec*norm_vec;
-		cout<<cos_alf<<endl;
 
-		float cos_0=light_vec*vecd3<float>(n_0,d3<float>(0,0,0));
-		float cos_1=light_vec*vecd3<float>(n_1,d3<float>(0,0,0));
-		float cos_2=light_vec*vecd3<float>(n_2,d3<float>(0,0,0));
+		vecd3<float> a0=(vecd3<float>(n_0.x,n_0.y,n_0.z));
+		a0.normalize();
+		vecd3<float> a1=(vecd3<float>(n_1.x,n_1.y,n_1.z));
+		a1.normalize();
+		vecd3<float> a2=(vecd3<float>(n_2.x,n_2.y,n_2.z));
+		a2.normalize();
+
+		float cos_0=light_vec*a0;
+		float cos_1=light_vec*a1;
+		float cos_2=light_vec*a2;
+
+
 
 
 	    if (cos_alf>0){
+	    	printf("%f %f %f\n", cos_0, cos_1, cos_2);
 	     int color_code = (int)(((cos_alf))*255);
 	     d3<int> p0(round(width*(tr_0.x+1.)/2.),round(height*(tr_0.y+1.)/2.), round(zeight*(tr_0.z+1.)/2.));
 	     d3<int> p1(round(width*(tr_1.x+1.)/2.),round(height*(tr_1.y+1.)/2.), round(zeight*(tr_1.z+1.)/2.));
 	     d3<int> p2(round(width*(tr_2.x+1.)/2.),round(height*(tr_2.y+1.)/2.), round(zeight*(tr_2.z+1.)/2.));
-		color_triangle(p0,p1,p2, image,cos_0, cos_1, cos_2, z_buffer);
+		color_triangle(p0,p1,p2, image,-cos_0, -cos_1, -cos_2, z_buffer);
 	}
 	   //  color_triangle(width*(tr_0.x+1.)/2., height*(tr_0.y+1.)/2., width*(tr_1.x+1.)/2., height*(tr_1.y+1.)/2., width*(tr_2.x+1.)/2., height*(tr_2.y+1.)/2., image, TGAColor(rand()%255,rand()%255, rand()%255, 255));
 
@@ -205,6 +214,7 @@ std::swap(y2, y1);
 
 void color_triangle_s(d3<int> p0, d3<int> p1, d3<int> p2, TGAImage &image, float inten_0, float inten_1,float inten_2, mtrx2d<int> & z_buffer){
 
+	//printf("%f %f %f\n", inten_0, inten_1, inten_2);
 
 	if (p0.y>p1.y) {
 		std::swap(p0, p1);
@@ -268,7 +278,8 @@ for (int t=min_v; t<=max_v; t++){
 		d3<int> p_cur(t,k,z_cur);
 		float inten_cur=get_inten(p_cur, p_down, p_up, inten_down, inten_up);
 		int color_code = (int)(((inten_cur))*255);
-		//color_code = std::max(std::min(color_code, 255), 0);
+		color_code = std::max(std::min(color_code, 255), 0);
+		//color_code=abs(color_code) % 255;
 		TGAColor color(color_code,color_code, color_code, 255);
 		if (z_buffer(t,k) < z_cur){
 		 image.set(t, k, color);
