@@ -12,6 +12,7 @@ void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor color);
 void color_triangle(d3<int> p0, d3<int> p1, d3<int> p2, TGAImage &image, float inten_0, float inten_1, float inten_2, mtrx2d<int> & z_buffer);
 void color_triangle_s(d3<int> p0, d3<int> p1, d3<int> p2, TGAImage &image, float inten_0, float inten_1,float inten_2, mtrx2d<int> & z_buffer);
 float sqrt3(int x, int y, int z);
+int round(float a);
 
 const TGAColor white = TGAColor(255, 255, 255, 255);
 const TGAColor red   = TGAColor(255, 0,   0,   255);
@@ -59,9 +60,9 @@ int main(int argc, char** argv) {
 
 	    if (cos_alf>0){
 	     int color_code = (int)(((cos_alf))*255);
-	     d3<int> p0(width*(tr_0.x+1.)/2.,height*(tr_0.y+1.)/2., zeight*(tr_0.z+1.)/2.);
-	     d3<int> p1(width*(tr_1.x+1.)/2.,height*(tr_1.y+1.)/2., zeight*(tr_1.z+1.)/2.);
-	     d3<int> p2(width*(tr_2.x+1.)/2.,height*(tr_2.y+1.)/2., zeight*(tr_2.z+1.)/2.);
+	     d3<int> p0(round(width*(tr_0.x+1.)/2.),round(height*(tr_0.y+1.)/2.), round(zeight*(tr_0.z+1.)/2.));
+	     d3<int> p1(round(width*(tr_1.x+1.)/2.),round(height*(tr_1.y+1.)/2.), round(zeight*(tr_1.z+1.)/2.));
+	     d3<int> p2(round(width*(tr_2.x+1.)/2.),round(height*(tr_2.y+1.)/2.), round(zeight*(tr_2.z+1.)/2.));
 		color_triangle(p0,p1,p2, image,cos_0, cos_1, cos_2, z_buffer);
 	}
 	   //  color_triangle(width*(tr_0.x+1.)/2., height*(tr_0.y+1.)/2., width*(tr_1.x+1.)/2., height*(tr_1.y+1.)/2., width*(tr_2.x+1.)/2., height*(tr_2.y+1.)/2., image, TGAColor(rand()%255,rand()%255, rand()%255, 255));
@@ -81,7 +82,9 @@ int main(int argc, char** argv) {
 }
 
 
-
+int round(float a){
+return (int)(a+0.5);
+}
 void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor color) {
     bool steep = false;
 
@@ -159,6 +162,7 @@ std::swap(p1, p2);
 std::swap(inten_1, inten_2);
 }
 
+if (p0.x==p1.x && p0.x==p2.x) return;
 
 int x0=p0.x;
 int y0=p0.y;
@@ -220,6 +224,8 @@ void color_triangle_s(d3<int> p0, d3<int> p1, d3<int> p2, TGAImage &image, float
 	int z_limitu;
 	int z_limitb;
 
+	if (x01==x2) return;
+
 //////////////*//////////////////
 ////////////\ *	 \///////////////
 //////////\	  *		\////////////
@@ -255,13 +261,14 @@ for (int t=min_v; t<=max_v; t++){
 	float inten_up =get_inten(p_up, p1, p2, inten_1, inten_2);
 	float inten_down =get_inten(p_down, p0, p2, inten_0, inten_2);
 
-	for (int k = y_b; k<=y_u; k++){
-		float Acur=((float)(p_up.z-p_down.z))/(p_up.y-p_down.y);
-		float Bcur = p_down.z-Acur*p_down.y;
-		z_cur=Acur*k+Bcur;
+	for (int k = p_down.y; k<=p_up.y; k++){
+		float Acur= ((float)(p_up.z-p_down.z))/(p_up.y-p_down.y);
+		float Bcur =  p_down.z-Acur*p_down.y;
+		z_cur=  Acur*k+Bcur;
 		d3<int> p_cur(t,k,z_cur);
 		float inten_cur=get_inten(p_cur, p_down, p_up, inten_down, inten_up);
 		int color_code = (int)(((inten_cur))*255);
+		//color_code = std::max(std::min(color_code, 255), 0);
 		TGAColor color(color_code,color_code, color_code, 255);
 		if (z_buffer(t,k) < z_cur){
 		 image.set(t, k, color);
