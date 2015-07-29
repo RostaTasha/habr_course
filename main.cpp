@@ -1,4 +1,4 @@
-#include "tgaimage.h"
+
 #include "parser.hpp"
 
 
@@ -9,8 +9,8 @@
 
 float get_inten(d3<int> p, d3<int> p1, d3<int> p2, float inten_1, float inten_2);
 void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor color);
-void color_triangle(d3<int> p0, d3<int> p1, d3<int> p2, TGAImage &image, float inten_0, float inten_1, float inten_2, mtrx2d<int> & z_buffer);
-void color_triangle_s(d3<int> p0, d3<int> p1, d3<int> p2, TGAImage &image, float inten_0, float inten_1,float inten_2, mtrx2d<int> & z_buffer);
+void color_triangle(d3<int> p0, d3<int> p1, d3<int> p2, TGAImage &image, float inten_0, float inten_1, float inten_2, mtrx2d<int> & z_buffer, d3<float> te0, d3<float> te1, d3<float> te2, TGAImage &text);
+void color_triangle_s(d3<int> p0, d3<int> p1, d3<int> p2, TGAImage &image, float inten_0, float inten_1,float inten_2, mtrx2d<int> & z_buffer, d3<float> te0, d3<float> te1, d3<float> te2, TGAImage &text);
 float sqrt3(int x, int y, int z);
 int round(float a);
 
@@ -25,13 +25,17 @@ const TGAColor blue   = TGAColor(0, 0,   255,   255);
 int main(int argc, char** argv) {
 	vector<d3<float> > real_coords;
 	vector<d3<float> > norm;
+	vector<d3<float> > text;
 	TGAImage image(width, height, TGAImage::RGB);
+	TGAImage text_file;
 	std::vector<d3<int> >  triangles;
 	std::vector<d3<int> >  norm_triangles;
+	std::vector<d3<int> >  text_triangles;
 
 	mtrx2d<int> z_buffer(width,height,std::numeric_limits<int>::min());
 
-	parser(real_coords, triangles, norm, norm_triangles);
+
+	parser(real_coords, triangles, norm, norm_triangles, text, text_triangles, text_file);
 
 
     vecd3<float> light_vec = vecd3<float>((float)(0.),(float)(0.),(float)(-1.));
@@ -44,6 +48,10 @@ int main(int argc, char** argv) {
 		d3<float> n_0=norm[norm_triangles[i].x-1];
 		d3<float> n_1=norm[norm_triangles[i].y-1];
 		d3<float> n_2=norm[norm_triangles[i].z-1];
+
+		d3<float> te_0=text[text_triangles[i].x-1];
+		d3<float> te_1=text[text_triangles[i].y-1];
+		d3<float> te_2=text[text_triangles[i].z-1];
 
 		vecd3<float> norm_vec = (vecd3<float>(tr_2,tr_0))^(vecd3<float>(tr_1,tr_0));
 
@@ -67,12 +75,11 @@ int main(int argc, char** argv) {
 
 
 	    if (cos_alf>0){
-	    	printf("%f %f %f\n", cos_0, cos_1, cos_2);
 	     int color_code = (int)(((cos_alf))*255);
 	     d3<int> p0(round(width*(tr_0.x+1.)/2.),round(height*(tr_0.y+1.)/2.), round(zeight*(tr_0.z+1.)/2.));
 	     d3<int> p1(round(width*(tr_1.x+1.)/2.),round(height*(tr_1.y+1.)/2.), round(zeight*(tr_1.z+1.)/2.));
 	     d3<int> p2(round(width*(tr_2.x+1.)/2.),round(height*(tr_2.y+1.)/2.), round(zeight*(tr_2.z+1.)/2.));
-		color_triangle(p0,p1,p2, image,-cos_0, -cos_1, -cos_2, z_buffer);
+		color_triangle(p0,p1,p2, image,-cos_0, -cos_1, -cos_2, z_buffer,te_0,te_1,te_2,text_file);
 	}
 	   //  color_triangle(width*(tr_0.x+1.)/2., height*(tr_0.y+1.)/2., width*(tr_1.x+1.)/2., height*(tr_1.y+1.)/2., width*(tr_2.x+1.)/2., height*(tr_2.y+1.)/2., image, TGAColor(rand()%255,rand()%255, rand()%255, 255));
 
@@ -126,7 +133,7 @@ void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor color) {
     }
 }
 
-void color_triangle(d3<int> p0, d3<int> p1, d3<int> p2, TGAImage &image, float inten_0, float inten_1, float inten_2, mtrx2d<int> & z_buffer){
+void color_triangle(d3<int> p0, d3<int> p1, d3<int> p2, TGAImage &image, float inten_0, float inten_1, float inten_2, mtrx2d<int> & z_buffer, d3<float> te0, d3<float> te1, d3<float> te2, TGAImage &text){
 
 
 
@@ -153,22 +160,26 @@ int l_border=min(min(p0.x,p1.x),p2.x);
 if (l_border==p0.x) {
 std::swap(p0, p1);
 std::swap(inten_0, inten_1);
+std::swap(te0, te1);
 }
 
 if (l_border==p2.x) {
 std::swap(p1, p2);
 std::swap(inten_1, inten_2);
+std::swap(te1, te2);
 }
 
 
 if (r_border==p0.x) {
 std::swap(p0, p2);
 std::swap(inten_0, inten_2);
+std::swap(te0, te2);
 }
 
 if (r_border==p1.x) {
 std::swap(p1, p2);
 std::swap(inten_1, inten_2);
+std::swap(te1, te2);
 }
 
 if (p0.x==p1.x && p0.x==p2.x) return;
@@ -187,8 +198,14 @@ int cross_coord_y=(int)((x0-x1)*(float)(y2-y1)/(float)(x2-x1)+y1);
 int cross_coord_z=(int)((x0-x1)*(float)(z2-z1)/(float)(x2-x1)+z1);
 d3<int> cross_p(x0,cross_coord_y,cross_coord_z);
 float inten_cross =get_inten(cross_p, p1, p2, inten_1, inten_2);
-color_triangle_s(p0,cross_p, p2, image, inten_0,inten_cross,inten_2, z_buffer);
-color_triangle_s(p0, cross_p, p1, image, inten_0,inten_cross,inten_1, z_buffer);
+d3<float> text_cross;
+text_cross.x=get_inten(cross_p, p1, p2, te1.x, te2.x);
+text_cross.y=get_inten(cross_p, p1, p2, te1.y, te2.y);
+
+
+
+color_triangle_s(p0,cross_p, p2, image, inten_0,inten_cross,inten_2, z_buffer, te0, text_cross, te2,text);
+color_triangle_s(p0, cross_p, p1, image, inten_0,inten_cross,inten_1, z_buffer, te0, text_cross, te1,text);
 /*if (u_border==y0){
 std::swap(x0, x2);
 std::swap(y0, y2);
@@ -212,13 +229,14 @@ std::swap(y2, y1);
 }
 
 
-void color_triangle_s(d3<int> p0, d3<int> p1, d3<int> p2, TGAImage &image, float inten_0, float inten_1,float inten_2, mtrx2d<int> & z_buffer){
+void color_triangle_s(d3<int> p0, d3<int> p1, d3<int> p2, TGAImage &image, float inten_0, float inten_1,float inten_2, mtrx2d<int> & z_buffer, d3<float> te0, d3<float> te1, d3<float> te2, TGAImage &text){
 
 	//printf("%f %f %f\n", inten_0, inten_1, inten_2);
 
 	if (p0.y>p1.y) {
 		std::swap(p0, p1);
 		std::swap(inten_0, inten_1);
+		std::swap(te0, te1);
 	}
 
 
@@ -269,7 +287,15 @@ for (int t=min_v; t<=max_v; t++){
 	d3<int> p_up(t,y_u,z_limitu);
 	d3<int> p_down(t,y_b,z_limitb);
 	float inten_up =get_inten(p_up, p1, p2, inten_1, inten_2);
+	d3<float> text_up;
+	text_up.x=get_inten(p_up, p1, p2, te1.x, te2.x);
+	text_up.y=get_inten(p_up, p1, p2, te1.y, te2.y);
+
+
 	float inten_down =get_inten(p_down, p0, p2, inten_0, inten_2);
+	d3<float> text_down;
+	text_down.x=get_inten(p_down, p0, p2, te0.x, te2.x);
+	text_down.y=get_inten(p_down, p0, p2, te0.y, te2.y);
 
 	for (int k = p_down.y; k<=p_up.y; k++){
 		float Acur= ((float)(p_up.z-p_down.z))/(p_up.y-p_down.y);
@@ -277,12 +303,21 @@ for (int t=min_v; t<=max_v; t++){
 		z_cur=  Acur*k+Bcur;
 		d3<int> p_cur(t,k,z_cur);
 		float inten_cur=get_inten(p_cur, p_down, p_up, inten_down, inten_up);
+		d3<float> text_cur;
+		text_cur.x=get_inten(p_cur, p_down, p_up, text_down.x, text_up.x);
+		text_cur.y=get_inten(p_cur, p_down, p_up, text_down.y, text_up.y);
+		int x = round(text.get_width()*text_cur.x);
+		int y = round(text.get_height()*(1.-text_cur.y));
+		TGAColor color1=text.get(x,y);
+
 		int color_code = (int)(((inten_cur))*255);
 		color_code = std::max(std::min(color_code, 255), 0);
 		//color_code=abs(color_code) % 255;
-		TGAColor color(color_code,color_code, color_code, 255);
+		//TGAColor color(color_code,color_code, color_code, 255);
+		inten_cur = std::max(std::min(inten_cur,1.0f), 0.0f);
+		TGAColor color2(round(((int)color1.r)*inten_cur),round(((int)color1.g)*inten_cur),round(((int)color1.b)*inten_cur),255);
 		if (z_buffer(t,k) < z_cur){
-		 image.set(t, k, color);
+		 image.set(t, k, color2);
 		 z_buffer(t,k)=z_cur;
 		}
 	}

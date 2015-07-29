@@ -8,6 +8,7 @@
 #ifndef PARSER_HPP_
 #define PARSER_HPP_
 
+#include "tgaimage.h"
 #include <iostream>
 #include <fstream>
 #include<vector>
@@ -109,7 +110,7 @@ void normalize(){
 
 
 
-void parser(std::vector<d3<float> >  & coords, std::vector<d3<int> >  & triangles, std::vector<d3<float> > & norm, std::vector<d3<int> >  & norm_triangles);
+void parser(std::vector<d3<float> >  & coords, std::vector<d3<int> >  & triangles, std::vector<d3<float> > & norm, std::vector<d3<int> >  & norm_triangles, std::vector<d3<float> > & text, std::vector<d3<int> >  & text_triangles, TGAImage & textures);
 float max(float a, float b);
 float min(float a, float b);
 
