@@ -1,6 +1,6 @@
 
 #include "parser.hpp"
-
+#include "matrix.h"
 
 
 
@@ -13,6 +13,7 @@ void color_triangle(d3<int> p0, d3<int> p1, d3<int> p2, TGAImage &image, float i
 void color_triangle_s(d3<int> p0, d3<int> p1, d3<int> p2, TGAImage &image, float inten_0, float inten_1,float inten_2, mtrx2d<int> & z_buffer, d3<float> te0, d3<float> te1, d3<float> te2, TGAImage &text);
 float sqrt3(int x, int y, int z);
 int round(float a);
+void perspective(d3<int> & p ,int z_cam);
 
 const TGAColor white = TGAColor(255, 255, 255, 255);
 const TGAColor red   = TGAColor(255, 0,   0,   255);
@@ -184,6 +185,19 @@ std::swap(te1, te2);
 
 if (p0.x==p1.x && p0.x==p2.x) return;
 
+
+int z_cam= 10000;
+
+printf("\n%d %d %d\t",p0.x,p0.y,p0.z);
+perspective(p0 ,z_cam);
+printf("\t%d %d %d\n",p0.x,p0.y,p0.z);
+printf("\n%d %d %d\t",p1.x,p1.y,p1.z);
+perspective(p1 ,z_cam);
+printf("\t%d %d %d\n",p1.x,p1.y,p1.z);
+printf("\n%d %d %d\t",p2.x,p2.y,p2.z);
+perspective(p2 ,z_cam);
+printf("\t%d %d %d\n",p2.x,p2.y,p2.z);
+
 int x0=p0.x;
 int y0=p0.y;
 int z0=p0.z;
@@ -316,7 +330,8 @@ for (int t=min_v; t<=max_v; t++){
 		//TGAColor color(color_code,color_code, color_code, 255);
 		inten_cur = std::max(std::min(inten_cur,1.0f), 0.0f);
 		TGAColor color2(round(((int)color1.r)*inten_cur),round(((int)color1.g)*inten_cur),round(((int)color1.b)*inten_cur),255);
-		if (z_buffer(t,k) < z_cur){
+		if ((z_buffer(t,k) < z_cur)){
+
 		 image.set(t, k, color2);
 		 z_buffer(t,k)=z_cur;
 		}
@@ -346,4 +361,22 @@ return (a>=b) ? a : b;
 
 float min(float a, float b){
 return (a>=b) ? b : a;
+}
+
+
+
+
+void perspective(d3<int> & p ,int z_cam){
+p.x-=width/2;
+p.y-=height/2;
+float temp_x=((float)p.x)/(1.0f-(float)p.z/(float)z_cam);
+float temp_y=((float)p.y)/(1.0f-(float)p.z/(float)z_cam);
+float temp_z=((float)p.z)/(1.0f-(float)p.z/(float)z_cam);
+p.x=(int)temp_x;
+p.y=(int)temp_y;
+p.z=(int)temp_z;
+p.x+=width/2;
+p.y+=height/2;
+std::cout<<"OKI DOKI"<<std::endl;
+
 }
