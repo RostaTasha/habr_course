@@ -1,5 +1,6 @@
 #include "parser.hpp"
 #include "matrix.h"
+#include "geometry.hpp"
 
 
 float get_inten(vec<int> p, vec<int> p1, vec<int> p2, float inten_1, float inten_2);
