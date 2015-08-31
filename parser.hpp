@@ -22,14 +22,14 @@
 using namespace std;
 
 template <typename T>
-class d3{
+class vec{
 public:
-d3 (T a, T b, T c){
+vec (T a, T b, T c){
 x=a;
 y=b;
 z=c;
 }
-d3(){
+vec(){
 x=0;
 y=0;
 z=0;
@@ -72,45 +72,45 @@ public:
 };
 
 template <typename T>
-class vecd3 : public d3<T> {
+class vecvec : public vec<T> {
 public:
 
-	vecd3 (T a, T b, T c) : d3<T>::d3(a, b, c){
+	vecvec (T a, T b, T c) : vec<T>::vec(a, b, c){
 	}
 
-	vecd3 (d3<T> a, d3<T>  b){
-		d3<T>::x=a.x-b.x;
-		d3<T>::y=a.y-b.y;
-		d3<T>::z=a.z-b.z;
+	vecvec (vec<T> a, vec<T>  b){
+		vec<T>::x=a.x-b.x;
+		vec<T>::y=a.y-b.y;
+		vec<T>::z=a.z-b.z;
 	}
-const vecd3 operator+(const vecd3& rv) const {
-        return  vecd3(d3<T>::x+rv.x,d3<T>::y+rv.y,d3<T>::z+rv.z);
+const vecvec operator+(const vecvec& rv) const {
+        return  vecvec(vec<T>::x+rv.x,vec<T>::y+rv.y,vec<T>::z+rv.z);
     }
 
-const vecd3 operator-(const vecd3& rv) const {
-        return  vecd3(d3<T>::x-rv.x,d3<T>::y-rv.y,d3<T>::z-rv.z);
+const vecvec operator-(const vecvec& rv) const {
+        return  vecvec(vec<T>::x-rv.x,vec<T>::y-rv.y,vec<T>::z-rv.z);
     }
 
-float operator*(const vecd3& rv) const {
-        return d3<T>::x*rv.x+ d3<T>::y*rv.y+ d3<T>::z*rv.z;
+float operator*(const vecvec& rv) const {
+        return vec<T>::x*rv.x+ vec<T>::y*rv.y+ vec<T>::z*rv.z;
     }
 
-const vecd3 operator^(const vecd3& rv) const {
-        return  vecd3(d3<T>::y*rv.z-d3<T>::z*rv.y, d3<T>::z*rv.x-d3<T>::x*rv.z, d3<T>::x*rv.y-d3<T>::y*rv.x);
+const vecvec operator^(const vecvec& rv) const {
+        return  vecvec(vec<T>::y*rv.z-vec<T>::z*rv.y, vec<T>::z*rv.x-vec<T>::x*rv.z, vec<T>::x*rv.y-vec<T>::y*rv.x);
     }
 
 void normalize(){
-	float temp=sqrt(d3<T>::x*d3<T>::x+d3<T>::y*d3<T>::y+d3<T>::z*d3<T>::z);
-	d3<T>::x=d3<T>::x/temp;
-	d3<T>::y=d3<T>::y/temp;
-	d3<T>::z=d3<T>::z/temp;
+	float temp=sqrt(vec<T>::x*vec<T>::x+vec<T>::y*vec<T>::y+vec<T>::z*vec<T>::z);
+	vec<T>::x=vec<T>::x/temp;
+	vec<T>::y=vec<T>::y/temp;
+	vec<T>::z=vec<T>::z/temp;
 }
 
 };
 
 
 
-void parser(std::vector<d3<float> >  & coords, std::vector<d3<int> >  & triangles, std::vector<d3<float> > & norm, std::vector<d3<int> >  & norm_triangles, std::vector<d3<float> > & text, std::vector<d3<int> >  & text_triangles, TGAImage & textures);
+void parser(std::vector<vec<float> >  & coords, std::vector<vec<int> >  & triangles, std::vector<vec<float> > & norm, std::vector<vec<int> >  & norm_triangles, std::vector<vec<float> > & text, std::vector<vec<int> >  & text_triangles, TGAImage & textures);
 float max(float a, float b);
 float min(float a, float b);
 

@@ -9,7 +9,8 @@
 #define MATRIX_H_
 
 #include <stdio.h>
-/*
+#include <string.h>
+
 class matrix{
 public:
 	int n;
@@ -65,7 +66,7 @@ public:
 		for (int j =0; j <mat_in.m;j++){
 
 			for (int k =0; k < m; k++)
-			ar_temp[i+n*j]+=this(i,k)*mat_in(k,j);
+			ar_temp[i+n*j]+=(*this)(i,k)*mat_in(k,j);
 
 	}
 
@@ -79,6 +80,6 @@ public:
 };
 
 
-*/
+
 
 #endif /* MATRIX_H_ */
