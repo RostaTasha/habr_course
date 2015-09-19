@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#if 0
 class matrix{
 public:
 	int n;
@@ -79,7 +80,7 @@ public:
 
 };
 
-
+#endif
 
 
 #endif /* MATRIX_H_ */

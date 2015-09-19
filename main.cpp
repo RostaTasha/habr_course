@@ -333,7 +333,7 @@ return (a>=b) ? b : a;
 void perspective(vec<int> & p ,int z_cam){
 p.x-=width/2;
 p.y-=height/2;
-float coeff=min((1.0f-(float)zeight/(float)z_cam)*2,1.0f);
+/*float coeff=min((1.0f-(float)zeight/(float)z_cam)*2,1.0f);
 float temp_x=coeff*((float)p.x)/(1.0f-(float)p.z/(float)z_cam);
 float temp_y=coeff*((float)p.y)/(1.0f-(float)p.z/(float)z_cam);
 float temp_z=coeff*((float)p.z)/(1.0f-(float)p.z/(float)z_cam);
@@ -341,5 +341,24 @@ p.x=(int)temp_x;
 p.y=(int)temp_y;
 p.z=(int)temp_z;
 p.x+=width/2;
-p.y+=height/2;
+p.y+=height/2;*/
+vect<4,float> vct;
+vct[0]=p.x;
+vct[1]=p.y;
+vct[2]=p.z;
+vct[3]=1;
+matrix<4,4,float> mtrx = matrix<4,4,float>::ones();
+
+mtrx[3][2]=-1.f/z_cam;
+
+
+vect<4,float> res=mtrx*vct;
+
+res=res/res[3];
+p.x=(int)res[0]+width/2;
+p.y=(int)res[1]+height/2;
+p.z=(int)res[2];
 }
+
+
+
