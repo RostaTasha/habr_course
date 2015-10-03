@@ -13,8 +13,8 @@ template <size_t DIM, typename T> struct vect {
     vect() { for (size_t i=DIM; i--; data_[i] = T()); }
           T& operator[](const size_t i)       {  assert(i<DIM); return data_[i]; }
     const T& operator[](const size_t i) const {  assert(i<DIM); return data_[i]; }
-    T norm() const {return sqrt((*this)*(*this));}
-    vect<DIM,T> normalize() const {return (*this)/this->norm();}
+    T norm() const {return (T)(sqrt((*this)*(*this)));}
+    vect<DIM,T> normalize() const {return ((*this)/this->norm());}
 
     static vect<DIM,T>  fill(const T & val=0) {
     vect<DIM,T> ret;
@@ -41,12 +41,24 @@ template <size_t DIM, typename T> vect<DIM,T > operator + (vect<DIM,T> lhs, cons
 
 }
 
+
+template <size_t DIM, typename T> T  operator * (vect<DIM,T>& lhs, vect<DIM,T>& rhs){
+T ret=0;
+	for (size_t i = DIM; i--;ret+=lhs[i]*rhs[i]);
+	 return ret;
+
+}
+
+
 template <size_t DIM, typename T> T  operator * (vect<DIM,T>& lhs, const vect<DIM,T>& rhs){
 T ret=0;
 	for (size_t i = DIM; i--;ret+=lhs[i]*rhs[i]);
 	 return ret;
 
 }
+
+
+
 
 template <size_t DIM, typename T> T  operator * (const vect<DIM,T>& lhs, vect<DIM,T>& rhs){
 T ret=0;
@@ -62,6 +74,8 @@ T ret=0;
 	 return ret;
 
 }
+
+
 
 template<size_t DIM_N,size_t DIM, typename T>   vect<DIM_N,T> embed(const vect<DIM,T> &v,const T& fill=1){
 vect<DIM_N,T> ret=vect<DIM_N,T>::fill(fill);
@@ -82,7 +96,7 @@ template <size_t DIM, typename T> vect<DIM,T >  operator * (vect<DIM,T> lhs , T 
 
 }
 
-template <size_t DIM, typename T> vect<DIM,T >  operator / (vect<DIM,T> lhs , T & val){
+template <size_t DIM, typename T> vect<DIM,T >  operator / (vect<DIM,T> lhs , T val){
 	for (size_t i = DIM; i--; lhs[i]/=val);
 	 return lhs;
 
@@ -90,6 +104,16 @@ template <size_t DIM, typename T> vect<DIM,T >  operator / (vect<DIM,T> lhs , T 
 
 
 
+
+
+
+template <typename T> vect<3,T > vect_mult(vect<3,T> lhs,vect<3,T> rhs){
+vect<3,T> ret;
+ret[0]=lhs[1]*rhs[2]-lhs[2]*rhs[1];
+ret[1]=lhs[2]*rhs[0]-lhs[0]*rhs[2];
+ret[2]=lhs[0]*rhs[1]-lhs[1]*rhs[0];
+return ret;
+}
 
 
 template<size_t COLS,size_t ROWS,typename Number> struct dt
