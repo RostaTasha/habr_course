@@ -7,13 +7,13 @@
 
 #include "parser.hpp"
 
-void parser(std::vector<vec<float> >  & coords, std::vector<vec<int> >  & triangles, std::vector<vec<float> > & norm, std::vector<vec<int> >  & norm_triangles, std::vector<vec<float> > & text, std::vector<vec<int> >  & text_triangles, TGAImage & textures){
+void parser(char * name_diff,char *  name, std::vector<vec<float> >  & coords, std::vector<vec<int> >  & triangles, std::vector<vec<float> > & norm, std::vector<vec<int> >  & norm_triangles, std::vector<vec<float> > & text, std::vector<vec<int> >  & text_triangles, TGAImage & textures){
 	  std::ifstream myfile;
 	  unsigned int num=0;
 	  float tempx, tempy,tempz;
 	  int tempa, tempb,tempc, tempa1, tempb1, tempc1, tempa2, tempb2, tempc2;
-	  textures.read_tga_file("african_head_diffuse.tga");
-	  myfile.open ("african_head.obj");
+	  textures.read_tga_file(name_diff);
+	  myfile.open (name);
 	  std::string line;
 	  while (std::getline(myfile, line))
 	  {

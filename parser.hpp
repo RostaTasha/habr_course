@@ -110,7 +110,7 @@ void normalize(){
 
 
 
-void parser(std::vector<vec<float> >  & coords, std::vector<vec<int> >  & triangles, std::vector<vec<float> > & norm, std::vector<vec<int> >  & norm_triangles, std::vector<vec<float> > & text, std::vector<vec<int> >  & text_triangles, TGAImage & textures);
+void parser(char * name_diff,char *  name,std::vector<vec<float> >  & coords, std::vector<vec<int> >  & triangles, std::vector<vec<float> > & norm, std::vector<vec<int> >  & norm_triangles, std::vector<vec<float> > & text, std::vector<vec<int> >  & text_triangles, TGAImage & textures);
 float max(float a, float b);
 float min(float a, float b);
 
