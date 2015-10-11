@@ -7,7 +7,9 @@
 
 #include "parser.hpp"
 
-void parser(char * name_diff,char *  name, std::vector<vec<float> >  & coords, std::vector<vec<int> >  & triangles, std::vector<vec<float> > & norm, std::vector<vec<int> >  & norm_triangles, std::vector<vec<float> > & text, std::vector<vec<int> >  & text_triangles, TGAImage & textures){
+//void parser(char * name_diff,char *  name, std::vector<vect<3,float>>  & coords , std::vector<vect<3,int>>  & triangles , std::vector<vect<3,float> > & norm, std::vector<vect<3,int> >  & norm_triangles, std::vector<vect<3,float> > & text, std::vector<vect<3,int> >  & text_triangles, TGAImage & textures){
+
+void parser(char * name_diff,char *  name,std::vector<vect<3,float> >  & coords, std::vector<vect<3,int> >  & triangles, std::vector<vect<3,float> > & norm, std::vector<vect<3,int> >  & norm_triangles, std::vector<vect<3,float> > & text, std::vector<vect<3,int> >  & text_triangles, TGAImage & textures){
 	  std::ifstream myfile;
 	  unsigned int num=0;
 	  float tempx, tempy,tempz;
@@ -22,7 +24,7 @@ void parser(char * name_diff,char *  name, std::vector<vec<float> >  & coords, s
 		  line=line.substr(2);
 		  std::istringstream  iss (line);
 		  iss>>tempx>>tempy>>tempz;
-		  coords.push_back(vec<float>(tempx,tempy,tempz));
+		  coords.push_back(vect<3,float>(tempx,tempy,tempz));
 	  }
 
 
@@ -30,25 +32,24 @@ void parser(char * name_diff,char *  name, std::vector<vec<float> >  & coords, s
 		  line=line.substr(2);
 		  std::istringstream  iss (line);
 		  iss>>tempx>>tempy>>tempz;
-		  norm.push_back(vec<float>(tempx,tempy,tempz));
+		  norm.push_back(vect<3,float>(tempx,tempy,tempz));
 	  }
 
 	  if (line[0]=='v' && line[1]=='t'){
 		  line=line.substr(2);
 		  std::istringstream  iss (line);
 		  iss>>tempx>>tempy>>tempz;
-		  text.push_back(vec<float>(tempx,tempy,tempz));
+		  text.push_back(vect<3,float>(tempx,tempy,tempz));
 	  }
 
 
 
 	  if (line[0]=='f' && line[1]==' '){
 		  line=line.substr(2);
-		  //std::cout<<line<<std::endl;
 		  std::sscanf (line.c_str(),"%d/%d/%d %d/%d/%d %d/%d/%d",&tempa,&tempa2,&tempa1,&tempb,&tempb2, &tempb1,&tempc,&tempc2,&tempc1);
-		  triangles.push_back(vec<int>(tempa, tempb, tempc));
-		  norm_triangles.push_back(vec<int>(tempa1, tempb1, tempc1));
-		  text_triangles.push_back(vec<int>(tempa2, tempb2, tempc2));
+		  triangles.push_back(vect<3,int>(tempa, tempb, tempc));
+		  norm_triangles.push_back(vect<3,int>(tempa1, tempb1, tempc1));
+		  text_triangles.push_back(vect<3,int>(tempa2, tempb2, tempc2));
 	  }
 
 	  }

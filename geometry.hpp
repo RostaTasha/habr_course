@@ -7,7 +7,41 @@
 
 #ifndef GEOMETRY_HPP_
 #define GEOMETRY_HPP_
-#include <assert.h>
+#include <cstdlib>
+#include "libs.hpp"
+
+
+template <typename T>
+class mtrx2d{
+
+public:
+
+
+
+	T & operator()(const int i, const int j){
+	 return (ar[i+w*j]);
+	}
+
+	mtrx2d(int h, int w, T val=0){
+	this->h=h;
+	this->w=w;
+	for (int i =0; i< h; i++){
+		for (int j =0; j< w; j++){
+		ar.push_back(val);
+	}
+	}
+	}
+
+
+
+
+	vector<T> ar;
+	int h;
+	int w;
+};
+
+
+
 
 template <size_t DIM, typename T> struct vect {
 
