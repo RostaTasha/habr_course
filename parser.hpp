@@ -15,12 +15,19 @@
 
 using namespace std;
 
+class Model{
+public:
+	std::vector<vect<3,vect<3,float> > >  coords_tri;
+	std::vector<vect<3,vect<3,float> > > norm_tri;
+	std::vector<vect<3,vect<2,float> > > text_tri;
+	TGAImage  textures;
+
+};
 
 
 
 
-
-void parser(char * name_diff,char *  name,std::vector<vect<3,float> >  & coords, std::vector<vect<3,int> >  & triangles, std::vector<vect<3,float> > & norm, std::vector<vect<3,int> >  & norm_triangles, std::vector<vect<3,float> > & text, std::vector<vect<3,int> >  & text_triangles, TGAImage & textures);
+void parser(char * name_diff,char *  name, Model &  mdl);
 float max(float a, float b);
 float min(float a, float b);
 

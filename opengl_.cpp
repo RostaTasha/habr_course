@@ -5,9 +5,11 @@ int round(float a){
 }
 
 
-void color_triangle(Shader shdr,TGAImage &image, float inten_0, float inten_1, float inten_2, mtrx2d<int> & z_buffer, vect<3,float> te0, vect<3,float> te1, vect<3,float> te2, TGAImage &text){
+void color_triangle(IShader & shdr, TGAImage &image,  mtrx2d<int> & z_buffer){
 
-	Shader sh_temp;
+	//    matrix<2,3,float> varying_uv;  // triangle uv coordinates, written by the vertex shader, read by the fragment shader
+    //matrix<4,3,float> varying_tri; // triangle coordinates (clip coordinates), written by VS, read by FS
+    //matrix<3,3,float> varying_nrm; // normal per vertex to be interpolated by FS
 
 
 	vect<3,int> points[3];
@@ -52,23 +54,31 @@ void color_triangle(Shader shdr,TGAImage &image, float inten_0, float inten_1, f
 				temp_clip=temp_clip/(temp_clip[0]+temp_clip[1]+temp_clip[2]);
 
 				p[2]=int(temp_clip*vect<3,float>(float(points[0][2]),float(points[1][2]),float(points[2][2])));
+
+				//TGAColor color2;
+
 				if ((temp[0]<0 || temp[1]<0 || temp[2]<0 || z_buffer(p[0],p[1]) > p[2]) ) continue;
+				//vect<3,float> temp_p=vect<3,float>((float)p[0],(float)p[1],(float)p[2]);
+				//if ( shdr.fragment(temp_p,color2)|| z_buffer(p[0],p[1]) > p[2]) continue;
 
-				vect<3,float> te_cur;
-				for (int i=0; i<3; i++) te_cur[i]=temp_clip*vect<3,float>(te0[i],te1[i],te2[i]);
-
-
-				int x = round(text.get_width()*te_cur[0]);
-				int y = round(text.get_height()*(1.-te_cur[1]));
-				TGAColor color1=text.get(x,y);
+				vect<2,float> te_cur;
+				for (int i=0; i<2; i++) te_cur[i]=temp_clip*vect<3,float>(shdr.varying_uv[i][0],shdr.varying_uv[i][1],shdr.varying_uv[i][2]);
 
 
-				inten_cur=(temp_clip*vect<3,float>(inten_0,inten_1,inten_2));
+
+
+				int x = round(shdr.textures.get_width()*te_cur[0]);
+				int y = round(shdr.textures.get_height()*(1.-te_cur[1]));
+				TGAColor color1=shdr.textures.get(x,y);
+
+
+				inten_cur=(temp_clip*vect<3,float>(shdr.varying_intensity[0],shdr.varying_intensity[1],shdr.varying_intensity[2]));
 
 				int color_code = (int)(((inten_cur))*255);
 				color_code = std::max(std::min(color_code, 255), 0);
 
 				inten_cur = std::max(std::min(inten_cur,1.0f), 0.0f);
+
 				TGAColor color2(round(((int)color1.r)*inten_cur),round(((int)color1.g)*inten_cur),round(((int)color1.b)*inten_cur),255);
 
 				image.set(p[0], p[1], color2);

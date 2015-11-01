@@ -4,6 +4,7 @@
 #include "matrix.h"
 #include "geometry.hpp"
 #include "opengl_.hpp"
+#include "limits.h"
 
 
 
@@ -18,19 +19,83 @@ const TGAColor white = TGAColor(255, 255, 255, 255);
 const TGAColor red   = TGAColor(255, 0,   0,   255);
 const TGAColor blue   = TGAColor(0, 0,   255,   255);
 
+matrix<4,4,float> ViewPortMtx;
+matrix<4,4,float> PerspMtx;
+matrix<4,4,float> view;
+
+
+vect<3,float> eye(1.,1.,3.);
+vect<3,float> center(0.,0.,0.);
+vect<3,float> up(0.,1.,0.);
+vect<3,float> light_vec(-1.,-1.,-1.);
+
+
+struct ShaderGuro : public IShader  {
+
+
+    virtual vect<4,float> vertex(int iface, int nthvert, Model * model){
+    	varying_intensity[nthvert] = std::max(0.f, (-1.f)*(model->norm_tri[iface][nthvert]*light_vec)); // get diffuse lighting intensity
+        vect<4,float> gl_Vertex;
+        gl_Vertex[3]=1;
+        for (int i =0; i<3; i++) gl_Vertex[i]= model->coords_tri[iface][nthvert][i];//embed<4>(model->vert(iface, nthvert)); // read the vertex from .obj file
+        gl_Vertex=ViewPortMtx*PerspMtx*view*gl_Vertex;
+
+        //varying_nrm.set_col(nthvert, proj<3>((Projection*ModelView).invert_transpose()*embed<4>(model->normal(iface, nthvert), 0.f)));
+        varying_nrm.setCol(nthvert,model->norm_tri[iface][nthvert]);
+        varying_tri.setCol(nthvert, gl_Vertex);
+        varying_uv.setCol(nthvert,model->text_tri[iface][nthvert]);
+        //varying_nrm.setCol(nthvert,)
+        textures=model->textures;
+
+        return gl_Vertex; // transform it to screen coordinates
+    }
+
+
+    virtual bool fragment(vect<3,float> bar, TGAColor &color){
+    	//float intensity=varying_intensity*bar;
+    	//color=TGAColor(255, 255, 255)*intensity;
+    	vect<3,float> abc[3];
+    	for(int j=0; j<3;j++){
+    	for (int i=0; i<3; i++){
+    	abc[j][i]=varying_tri[i][j]/varying_tri[3][j];
+    	}
+    	}
+
+    	vect<3,float> ab = abc[1]-abc[0];
+    	vect<3,float> ac = abc[2]-abc[0];
+    	vect<3,float> pa= abc[0]-bar;
+    	vect<3,float> nn=vect<3,float>(float(ab[0]),float(ac[0]),float(pa[0]));
+    	vect<3,float> mm=vect<3,float>(float(ab[1]),float(ac[1]),float(pa[1]));
+    	vect<3,float> res = vect_mult(nn,mm);
+    	//printf("res  %f %f %f\n",res[0],res[1],res[2]);
+    	vect<3,float> temp_clip = vect<3,float>(1.f-float(res[0]+res[1])/res[2],float(res[0])/res[2],float(res[1])/res[2]);
+    	for (int i =0; i<3; i++) {temp_clip=temp_clip/varying_tri[3][i];}
+    	temp_clip=temp_clip/(temp_clip[0]+temp_clip[1]+temp_clip[2]);
+    	if (std::fabs(res[2])<1.f) return true;
+    	float inten_cur=(temp_clip*vect<3,float>(varying_intensity[0],varying_intensity[1],varying_intensity[2]));
+    	inten_cur = std::max(std::min(inten_cur,1.0f), 0.0f);
+
+    	vect<2,float> te_cur;
+    	for (int i=0; i<2; i++) te_cur[i]=temp_clip*vect<3,float>(varying_uv[i][0],varying_uv[i][1],varying_uv[i][2]);
+
+		int x = round(textures.get_width()*te_cur[0]);
+		int y = round(textures.get_height()*(1.-te_cur[1]));
+		color = (textures.get(x,y))*inten_cur;
+
+    	return false;
+    }
+
+};
+
 
 
 
 
 int main(int argc, char** argv) {
-	vector<vect<3,float> > real_coords;
-	vector<vect<3,float> > norm;
-	vector<vect<3,float> > text;
+
 	TGAImage image(width, height, TGAImage::RGB);
-	TGAImage text_file;
-	std::vector<vect<3,int> >  triangles;
-	std::vector<vect<3,int> >  norm_triangles;
-	std::vector<vect<3,int> >  text_triangles;
+
+
 
 	mtrx2d<int> z_buffer(width,height,std::numeric_limits<int>::min());
 
@@ -60,86 +125,30 @@ int main(int argc, char** argv) {
 
 
 
-	real_coords.clear();
-	triangles.clear();
-	norm.clear();
-	norm_triangles.clear();
-	text.clear();
-	text_triangles.clear();
-	text_file.clear();
-	parser(name_file_diff,name_file,real_coords, triangles, norm, norm_triangles, text, text_triangles, text_file);
+	Model mdl;
 
-    vect<3,float> eye;
-    eye[0]=1; eye[1]=1; eye[2]=3;
-    vect<3,float> center;
-    center[0]=0; center[1]=0; center[2]=0;
-    vect<3,float> up;
-    up[0]=0; up[1]=1; up[2]=0;
-    vect<3,float> light_vec;
-	light_vec[0]=-1; light_vec[1]=-1; light_vec[2]=-1;
+
 	light_vec=light_vec.normalize();
 
 
 
-    matrix<4,4,float> ViewPortMtx=viewport(0, 0, width, height, zeight);
-    matrix<4,4,float> PerspMtx=perspective((eye-center).norm());
-    matrix<4,4,float> view = lookat(eye, center,up);
+    ViewPortMtx=viewport(0, 0, width, height, zeight);
+    PerspMtx=perspective((eye-center).norm());
+    view = lookat(eye, center,up);
 
 
-    matrix<4,4,float> mtrx = ViewPortMtx*PerspMtx*view;
-    matrix<4,4,float> mtrx_=mtrx.Adjacent();
+	parser(name_file_diff,name_file,mdl);
+	ShaderGuro shader;
 
 
-	vect<3,float> tr[3];
-	vect<3,float> n[3];
-	vect<3,float> te[3];
-	float cos[3];
 
-	vect<4,float> res0;
-	vect<4,float> res1;
-	vect<4,float> res2;
+	for(std::vector<int>::size_type i = 0; i != mdl.coords_tri.size(); i++) {
 
-    vect<4,float> v[3];
-    Shader shdr;
+		 for (int j=0; j<3; j++) {
+		     	 shader.vertex(i, j,&mdl);
+		        }
 
-	for(std::vector<int>::size_type i = 0; i != triangles.size(); i++) {
-
-		for (int j=0; j<3; j++){
-			for (int k=0; k<3; k++){
-				tr[j][k]=real_coords[triangles[i][j]-1][k];
-				n[j][k]=norm[norm_triangles[i][j]-1][k];
-				te[j][k]=text[text_triangles[i][j]-1][k];
-			}
-		}
-
-		for (int k=0; k<3;k++ ){
-
-			n[k]=n[k].normalize();
-			vect<3,float> temp=n[k];
-			cos[k]=light_vec*temp;
-		}
-
-
-	     for (int j = 0; j<3; j++){
-	    	 for (int k =0; k<3; k++){
-	    		 v[j][k]=tr[j][k];
-	    	 }
-	    	 v[j][3]=1;
-	     }
-
-	    res0 =(mtrx*matrix<4,1,float>::make_from_vec_col(v[0])).col(0);
-	    res1 =(mtrx*matrix<4,1,float>::make_from_vec_col(v[1])).col(0);
-	    res2 =(mtrx*matrix<4,1,float>::make_from_vec_col(v[2])).col(0);
-
-	    matrix<4,3,float> temp;
-	    for (int i=0; i<4;i++){
-	    	temp[i][0]=res0[i];
-	    	temp[i][1]=res1[i];
-	    	temp[i][2]=res2[i];
-	    	}
-
-	    shdr.varying_tri=temp;
-	    color_triangle(shdr, image,-cos[0], -cos[1], -cos[2], z_buffer,te[0],te[1],te[2],text_file);
+	    color_triangle(shader, image, z_buffer);
 
 	}
 	}

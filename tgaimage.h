@@ -57,6 +57,12 @@ struct TGAColor {
 		}
 		return *this;
 	}
+
+	TGAColor operator *(float t) {
+
+
+		return TGAColor(char(this->r*t),char(this->g*t),char(this->b*t),this->a);
+	}
 };
 
 

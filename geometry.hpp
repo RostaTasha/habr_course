@@ -47,6 +47,8 @@ template <size_t DIM, typename T> struct vect {
 
 	vect(T data1, T data2, T data3){
 		data_[0] = data1; data_[1] = data2; data_[2] = data3;}
+	vect(T data1, T data2){
+		data_[0] = data1; data_[1] = data2;}
     vect() { for (size_t i=DIM; i--; data_[i] = T()); }
           T& operator[](const size_t i)       {  assert(i<DIM); return data_[i]; }
     const T& operator[](const size_t i) const {  assert(i<DIM); return data_[i]; }
