@@ -61,7 +61,7 @@ struct TGAColor {
 	TGAColor operator *(float t) {
 
 
-		return TGAColor(char(this->r*t),char(this->g*t),char(this->b*t),this->a);
+		return TGAColor(round(this->r*t),round(this->g*t),round(this->b*t),this->a);
 	}
 };
 

@@ -42,11 +42,15 @@ void color_triangle(IShader & shdr, TGAImage &image,  mtrx2d<int> & z_buffer){
 	float inten_cur;
 	vect<3,float> temp_clip;
 	vect<3,float> temp;
+	TGAColor color2;
 
 	for (p[0]=l_border; p[0]<r_border; p[0]++){
+
+
+		if (!(p[0]<width  && p[0]>=0 )) continue;
 		for (p[1]=b_border; p[1]<u_border; p[1]++){
 
-				if (!((p[0]<width && p[1]< height && p[0]>=0 && p[1]>=0))) continue;
+				if (!(p[1]< height &&  p[1]>=0)) continue;
 
 				temp=xy_to_bc(points,p);
 				for (int i=0; i<3; i++)temp_clip[i]=temp[i]/shdr.varying_tri[3][i];
@@ -55,32 +59,9 @@ void color_triangle(IShader & shdr, TGAImage &image,  mtrx2d<int> & z_buffer){
 
 				p[2]=int(temp_clip*vect<3,float>(float(points[0][2]),float(points[1][2]),float(points[2][2])));
 
-				//TGAColor color2;
-
 				if ((temp[0]<0 || temp[1]<0 || temp[2]<0 || z_buffer(p[0],p[1]) > p[2]) ) continue;
-				//vect<3,float> temp_p=vect<3,float>((float)p[0],(float)p[1],(float)p[2]);
-				//if ( shdr.fragment(temp_p,color2)|| z_buffer(p[0],p[1]) > p[2]) continue;
 
-				vect<2,float> te_cur;
-				for (int i=0; i<2; i++) te_cur[i]=temp_clip*vect<3,float>(shdr.varying_uv[i][0],shdr.varying_uv[i][1],shdr.varying_uv[i][2]);
-
-
-
-
-				int x = round(shdr.textures.get_width()*te_cur[0]);
-				int y = round(shdr.textures.get_height()*(1.-te_cur[1]));
-				TGAColor color1=shdr.textures.get(x,y);
-
-
-				inten_cur=(temp_clip*vect<3,float>(shdr.varying_intensity[0],shdr.varying_intensity[1],shdr.varying_intensity[2]));
-
-				int color_code = (int)(((inten_cur))*255);
-				color_code = std::max(std::min(color_code, 255), 0);
-
-				inten_cur = std::max(std::min(inten_cur,1.0f), 0.0f);
-
-				TGAColor color2(round(((int)color1.r)*inten_cur),round(((int)color1.g)*inten_cur),round(((int)color1.b)*inten_cur),255);
-
+				shdr.fragment(temp,color2);
 				image.set(p[0], p[1], color2);
 				z_buffer(p[0],p[1])=p[2];
 
@@ -154,6 +135,6 @@ vect<3,float> xy_to_bc(vect<3,int> * abc, vect<3,int> p ){
 	vect<3,float> mm=vect<3,float>(float(ab[1]),float(ac[1]),float(pa[1]));
 	vect<3,float> res = vect_mult(nn,mm);
 	//printf("res  %f %f %f\n",res[0],res[1],res[2]);
-	if (std::fabs(res[2])<1.f) return vect<3,float>(-1.f,1.f,1.f);
+	if (std::fabs(res[2])<1.f) return vect<3,float>(-1.f,1.f,1.f); //// triangle is degenerate, in this case return smth with negative coordinates
 	return vect<3,float>(1.f-float(res[0]+res[1])/res[2],float(res[0])/res[2],float(res[1])/res[2]);
 }

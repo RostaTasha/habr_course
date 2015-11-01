@@ -27,53 +27,50 @@ matrix<4,4,float> view;
 vect<3,float> eye(1.,1.,3.);
 vect<3,float> center(0.,0.,0.);
 vect<3,float> up(0.,1.,0.);
-vect<3,float> light_vec(-1.,-1.,-1.);
+vect<3,float> light_vec(1.,1.,1.);
 
 
 struct ShaderGuro : public IShader  {
 
 
     virtual vect<4,float> vertex(int iface, int nthvert, Model * model){
-    	varying_intensity[nthvert] = std::max(0.f, (-1.f)*(model->norm_tri[iface][nthvert]*light_vec)); // get diffuse lighting intensity
+    	varying_intensity[nthvert] = std::max(0.f, (model->norm_tri[iface][nthvert]*light_vec)); // get diffuse lighting intensity
         vect<4,float> gl_Vertex;
         gl_Vertex[3]=1;
         for (int i =0; i<3; i++) gl_Vertex[i]= model->coords_tri[iface][nthvert][i];//embed<4>(model->vert(iface, nthvert)); // read the vertex from .obj file
         gl_Vertex=ViewPortMtx*PerspMtx*view*gl_Vertex;
 
         //varying_nrm.set_col(nthvert, proj<3>((Projection*ModelView).invert_transpose()*embed<4>(model->normal(iface, nthvert), 0.f)));
-        varying_nrm.setCol(nthvert,model->norm_tri[iface][nthvert]);
+
+        vect<4,float> gl_norm;
+        gl_norm[0]=(model->norm_tri[iface][nthvert])[0];
+        gl_norm[1]=(model->norm_tri[iface][nthvert])[1];
+        gl_norm[2]=(model->norm_tri[iface][nthvert])[2];
+        gl_norm=(ViewPortMtx*PerspMtx*view).Adjacent()*gl_norm;
+        varying_nrm.setCol(nthvert,vect<3,float>(gl_norm[0],gl_norm[1],gl_norm[2]));
+
         varying_tri.setCol(nthvert, gl_Vertex);
         varying_uv.setCol(nthvert,model->text_tri[iface][nthvert]);
-        //varying_nrm.setCol(nthvert,)
-        textures=model->textures;
 
+        textures=model->textures;
         return gl_Vertex; // transform it to screen coordinates
     }
 
 
-    virtual bool fragment(vect<3,float> bar, TGAColor &color){
-    	//float intensity=varying_intensity*bar;
-    	//color=TGAColor(255, 255, 255)*intensity;
-    	vect<3,float> abc[3];
-    	for(int j=0; j<3;j++){
-    	for (int i=0; i<3; i++){
-    	abc[j][i]=varying_tri[i][j]/varying_tri[3][j];
-    	}
-    	}
+     ~ShaderGuro(){
+    }
 
-    	vect<3,float> ab = abc[1]-abc[0];
-    	vect<3,float> ac = abc[2]-abc[0];
-    	vect<3,float> pa= abc[0]-bar;
-    	vect<3,float> nn=vect<3,float>(float(ab[0]),float(ac[0]),float(pa[0]));
-    	vect<3,float> mm=vect<3,float>(float(ab[1]),float(ac[1]),float(pa[1]));
-    	vect<3,float> res = vect_mult(nn,mm);
-    	//printf("res  %f %f %f\n",res[0],res[1],res[2]);
-    	vect<3,float> temp_clip = vect<3,float>(1.f-float(res[0]+res[1])/res[2],float(res[0])/res[2],float(res[1])/res[2]);
-    	for (int i =0; i<3; i++) {temp_clip=temp_clip/varying_tri[3][i];}
-    	temp_clip=temp_clip/(temp_clip[0]+temp_clip[1]+temp_clip[2]);
-    	if (std::fabs(res[2])<1.f) return true;
-    	float inten_cur=(temp_clip*vect<3,float>(varying_intensity[0],varying_intensity[1],varying_intensity[2]));
-    	inten_cur = std::max(std::min(inten_cur,1.0f), 0.0f);
+
+    virtual bool fragment(vect<3,float> bar, TGAColor &color){
+
+    	vect<3,float> temp_clip;
+
+		for (int i=0; i<3; i++)temp_clip[i]=bar[i]/varying_tri[3][i];
+
+		temp_clip=temp_clip/(temp_clip[0]+temp_clip[1]+temp_clip[2]);
+
+		float inten_cur=(temp_clip*vect<3,float>(varying_intensity[0],varying_intensity[1],varying_intensity[2]));
+
 
     	vect<2,float> te_cur;
     	for (int i=0; i<2; i++) te_cur[i]=temp_clip*vect<3,float>(varying_uv[i][0],varying_uv[i][1],varying_uv[i][2]);
@@ -115,9 +112,24 @@ int main(int argc, char** argv) {
 	char name_file[40];
 	char name_file_diff[40];
 
+    ViewPortMtx=viewport(0, 0, width, height, zeight);
+    PerspMtx=perspective((eye-center).norm());
+    view = lookat(eye, center,up);
 
 
-	for (int i =0; i<3; i++){
+	//light_dir = proj<3>((Projection*ModelView*embed<4>(light_dir, 0.f))).normalize();
+	vect<4,float> gl_light;
+	gl_light[0]=light_vec[0];
+	gl_light[1]=light_vec[1];
+	gl_light[2]=light_vec[2];
+
+	gl_light=ViewPortMtx*PerspMtx*view*gl_light;
+	light_vec=vect<3,float>(gl_light[0],gl_light[1],gl_light[2]);
+
+	light_vec=light_vec.normalize();
+
+
+	for (int i =0; i<names.size(); i++){
 
 	strcpy(name_file,names[i].c_str());
 	strcpy(name_file_diff,diffs[i].c_str());
@@ -128,19 +140,14 @@ int main(int argc, char** argv) {
 	Model mdl;
 
 
-	light_vec=light_vec.normalize();
 
-
-
-    ViewPortMtx=viewport(0, 0, width, height, zeight);
-    PerspMtx=perspective((eye-center).norm());
-    view = lookat(eye, center,up);
 
 
 	parser(name_file_diff,name_file,mdl);
 	ShaderGuro shader;
 
 
+	printf("OKI DOKI!\n");
 
 	for(std::vector<int>::size_type i = 0; i != mdl.coords_tri.size(); i++) {
 
@@ -152,6 +159,7 @@ int main(int argc, char** argv) {
 
 	}
 	}
+
 
 	image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
 	image.write_tga_file("output.tga");

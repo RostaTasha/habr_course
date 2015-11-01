@@ -11,7 +11,7 @@
 #define zeight 1000
 
 struct IShader{
-    //virtual ~IShader();
+    virtual ~IShader(){};
     virtual vect<4,float> vertex(int iface, int nthvert,Model * model) = 0;
     virtual bool fragment(vect<3,float> bar, TGAColor &color) = 0;
     TGAImage textures;
