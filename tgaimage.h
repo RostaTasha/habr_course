@@ -63,6 +63,12 @@ struct TGAColor {
 
 		return TGAColor(round(this->r*t),round(this->g*t),round(this->b*t),this->a);
 	}
+
+	unsigned char & operator [](int t) {
+
+
+		return raw[t];
+	}
 };
 
 

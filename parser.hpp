@@ -21,13 +21,15 @@ public:
 	std::vector<vect<3,vect<3,float> > > norm_tri;
 	std::vector<vect<3,vect<2,float> > > text_tri;
 	TGAImage  textures;
+	TGAImage norms;
+	TGAImage gls;
 
 };
 
 
 
 
-void parser(char * name_diff,char *  name, Model &  mdl);
+void parser(char * name_diff,char *  name, char * name_norm, char * name_gls, Model &  mdl);
 float max(float a, float b);
 float min(float a, float b);
 

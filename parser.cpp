@@ -9,18 +9,26 @@
 
 //void parser(char * name_diff,char *  name, std::vector<vect<3,float>>  & coords , std::vector<vect<3,int>>  & triangles , std::vector<vect<3,float> > & norm, std::vector<vect<3,int> >  & norm_triangles, std::vector<vect<3,float> > & text, std::vector<vect<3,int> >  & text_triangles, TGAImage & textures){
 
-void parser(char * name_diff,char *  name, Model &  mdl){
+void parser(char * name_diff,char *  name, char * name_norm, char * name_gloss, Model &  mdl){
 	  std::ifstream myfile;
 	  unsigned int num=0;
 	  float tempx, tempy,tempz;
 	  int tempa, tempb,tempc, tempa1, tempb1, tempc1, tempa2, tempb2, tempc2;
 	  mdl.textures.read_tga_file(name_diff);
+	  mdl.norms.read_tga_file(name_norm);
+	  mdl.gls.read_tga_file(name_gloss);
+
+	 // printf(" tram param %d %d\n",mdl.norms.get_height(),mdl.norms.get_width());
 	  myfile.open (name);
 	  std::string line;
 
 	  std::vector<vect<3,float> > coords;
 	  std::vector<vect<2,float> > text;
 	  std::vector<vect<3,float> > norm;
+
+	  coords.reserve(1000);
+	  text.reserve(1000);
+	  norm.reserve(1000);
 	  //std::vector<vect<3,int> > triangles;
 	  //std::vector<vect<3,int> > norm_triangles;
 	  //std::vector<vect<3,int> > text_triangles;

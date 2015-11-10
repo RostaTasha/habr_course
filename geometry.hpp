@@ -91,6 +91,14 @@ T ret=0;
 }
 
 
+template <size_t DIM, typename T> vect<DIM,T>   operator * (T lhs, vect<DIM,T>& rhs){
+vect<DIM,T> ret;
+	for (size_t i = DIM; i--;ret[i]=lhs*rhs[i]);
+	 return ret;
+
+}
+
+
 template <size_t DIM, typename T> T  operator * (vect<DIM,T>& lhs, const vect<DIM,T>& rhs){
 T ret=0;
 	for (size_t i = DIM; i--;ret+=lhs[i]*rhs[i]);
