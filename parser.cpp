@@ -15,8 +15,11 @@ void parser(char * name_diff,char *  name, char * name_norm, char * name_gloss, 
 	  float tempx, tempy,tempz;
 	  int tempa, tempb,tempc, tempa1, tempb1, tempc1, tempa2, tempb2, tempc2;
 	  mdl.textures.read_tga_file(name_diff);
+	  mdl.textures.flip_vertically();
 	  mdl.norms.read_tga_file(name_norm);
+	  mdl.norms.flip_vertically();
 	  mdl.gls.read_tga_file(name_gloss);
+	  mdl.gls.flip_vertically();
 
 	 // printf(" tram param %d %d\n",mdl.norms.get_height(),mdl.norms.get_width());
 	  myfile.open (name);

@@ -6,9 +6,9 @@
 #include "geometry.hpp"
 #include "parser.hpp"
 
-#define width 1000
-#define height 1000
-#define zeight 1000
+#define width 800
+#define height 800
+#define zeight 800
 
 struct IShader{
     virtual ~IShader(){};
@@ -29,9 +29,9 @@ struct IShader{
 
 
 
-vect<3,float> xy_to_bc(vect<3,int> * abc, vect<3,int> p );
+vect<3,float> xy_to_bc(vect<3,float> * abc, vect<3,int> p );
 
-void color_triangle(IShader & shdr, TGAImage &image,  mtrx2d<int> & z_buffer);
+void color_triangle(IShader & shdr, TGAImage &image,  mtrx2d<float> & z_buffer);
 
 
 

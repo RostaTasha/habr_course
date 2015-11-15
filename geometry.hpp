@@ -303,6 +303,33 @@ public:
 	               return(ret);
 	           }
 
+	        T cofactor(size_t row, size_t col) const {
+	               return minor(row,col).det()*((row+col)%2 ? -1 : 1);
+	           }
+
+	        matrix<ROWS,COLS,T> adjugate() const {
+	            matrix<ROWS,COLS,T> ret;
+	            for (size_t i=ROWS; i--; )
+	                for (size_t j=COLS; j--; ret[i][j]=cofactor(i,j));
+	            return ret;
+	        }
+
+	        matrix<ROWS,COLS,T>invert_transpose() {
+	        	matrix<ROWS,COLS,T> ret = adjugate();
+	            T tmp = ret[0]*data_[0];
+	            return ret/tmp;
+	        }
+
+	        matrix<ROWS,COLS,T> invert() {
+	            return invert_transpose().transpose();
+	        }
+
+	        matrix<ROWS,COLS,T> transpose() {
+	        	matrix<ROWS,COLS,T>ret;
+	            for (size_t i=COLS; i--; ret[i]=this->col(i));
+	            return ret;
+	        }
+
 
 	        matrix<ROWS,COLS,T> invertT()const
 	            {
